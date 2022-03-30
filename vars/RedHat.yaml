@@ -1,0 +1,2 @@
+---
+repo_url: "http://{{ token | mandatory }}:null@downloads.linux.hpe.com/repo/fwpp-{{ generation }}/RedHat/{{ ansible_distribution_major_version }}/$basearch/current"

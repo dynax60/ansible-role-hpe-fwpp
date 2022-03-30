@@ -1,0 +1,24 @@
+---
+- name: check if token defined
+  fail:
+    msg: |
+      Please, define token variable to access HPE firmware. 
+      Generate token here: https://support.hpe.com/hpsc/swd/entitlement-token-service/generate"
+  when: token is not defined
+
+- name: include OS-specific vars
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yaml"
+    - "{{ ansible_os_family }}.yaml"
+
+- name: get ProLiant generation
+  set_fact:
+    generation: "{{ ansible_product_name.split(' ')[2] | lower }}"
+
+- name: include OS-specific tasks
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}.yaml"
+    - "{{ ansible_os_family }}.yaml"
+  tags: always

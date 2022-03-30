@@ -1,0 +1,2 @@
+---
+repo_gpg_key: https://downloads.linux.hpe.com/SDR/repo/fwpp-{{ generation }}/GPG-KEY-FirmwarePackforProLiant
