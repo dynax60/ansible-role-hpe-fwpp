@@ -1,0 +1,22 @@
+---
+- name: Install {{ pkg }}
+  ansible.builtin.package:
+    name: "{{ pkg }}"
+    state: latest
+  register: installed
+  tags:
+    - packages
+
+- name: Get path for updated firmware
+  ansible.builtin.command: /usr/bin/rpm -ql "{{ pkg }}" | /usr/bin/awk 'NR==1{print $1}'
+  register: installed_path
+  when: installed.changed
+  tags:
+    - packages
+
+- name: Path to update firmware for {{ pkg }}
+  debug:
+    var: installed_path.stdout
+  when: installed.changed
+  tags:
+    - packages

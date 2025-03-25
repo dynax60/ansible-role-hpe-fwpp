@@ -1,5 +1,5 @@
 ---
-- name: add fwpp repo
+- name: Add fwpp repo {{ repo_url }}
   ansible.builtin.yum_repository:
     name: fwpp
     description: Firmware Pack for ProLiant
@@ -9,10 +9,8 @@
     gpgkey: "{{ repo_gpg_key }}"
   tags: repo
 
-- name: install packages
-  ansible.builtin.package:
-    name: "{{ pkg }}"
-    state: present
+- name: Install packages
+  ansible.builtin.include_tasks: RedHat-install-package.yml
   loop: "{{ hpe_fwpp_packages }}"
   loop_control:
     loop_var: pkg

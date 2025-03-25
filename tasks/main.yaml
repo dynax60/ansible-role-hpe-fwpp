@@ -1,22 +1,42 @@
 ---
-- name: check if token defined
-  fail:
+- name: Get ProLiant generation
+  ansible.builtin.set_fact:
+    generation: "{{ ansible_product_name.split(' ')[2] | lower }}"
+
+- name: Debug generation
+  ansible.builtin.debug:
+    var: generation
+
+- name: Check if token defined
+  ansible.builtin.fail:
     msg: |
       Please, define token variable to access HPE firmware. 
       Generate token here: https://support.hpe.com/hpsc/swd/entitlement-token-service/generate"
-  when: token is not defined
+  when:
+    - token is not defined
+    - generation is defined
+    - ('gen9' in generation or 'gen8' in generation)
 
-- name: include OS-specific vars
+- name: Prepare repo_url_prep
+  ansible.builtin.set_fact:
+    repo_url_prep: >-
+      {%- if generation is defined and ('gen9' in generation or 'gen8' in generation) -%}
+      https://{{ token | mandatory }}:null@downloads.linux.hpe.com/repo/fwpp-{{ generation }}
+      {%- else -%}
+      https://downloads.linux.hpe.com/repo/fwpp-{{ generation }}
+      {%- endif %}
+
+- name: Debug repo_url_prep
+  ansible.builtin.debug:
+    var: repo_url_prep
+
+- name: Include OS-specific vars
   ansible.builtin.include_vars: "{{ item }}"
   with_first_found:
     - "{{ ansible_distribution }}.yaml"
     - "{{ ansible_os_family }}.yaml"
 
-- name: get ProLiant generation
-  set_fact:
-    generation: "{{ ansible_product_name.split(' ')[2] | lower }}"
-
-- name: include OS-specific tasks
+- name: Include OS-specific tasks
   ansible.builtin.include_tasks: "{{ item }}"
   with_first_found:
     - "{{ ansible_distribution }}.yaml"
